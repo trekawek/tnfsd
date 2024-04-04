@@ -45,7 +45,7 @@ int main(int argc, char **argv)
     char *uvalue = NULL;
     char *gvalue = NULL;
     char *pvalue = NULL;
-    
+
     if(argc >= 2)
     {
         #ifdef ENABLE_CHROOT
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
                     LOG("option needs a value\n");
                     break;
                 case '?':
-                    LOG("unknown option: %c\n", optopt); 
+                    LOG("unknown option: %c\n", optopt);
                     break;
             }
         }
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     #endif
     exit(-1);
     }
-    
+
     #ifdef ENABLE_CHROOT
     if (uvalue || gvalue)
     {
@@ -116,13 +116,13 @@ int main(int argc, char **argv)
 		LOG("Invalid root directory\n");
 		exit(-1);
 	}
-    
+
     #ifdef ENABLE_CHROOT
     warn_if_root();
     #endif
-    
+
     int port = TNFSD_PORT;
-    
+
     if (pvalue)
     {
         port = atoi(pvalue);
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
         }
     }
 
-	const char *version = "20.1115.2";
+	const char *version = "23.0404.1";
 
 	LOG("Starting tnfsd version %s on port %d using root directory \"%s\"\n", version, port, argv[optind]);
 
