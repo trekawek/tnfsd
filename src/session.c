@@ -291,7 +291,9 @@ Session *tnfs_findsession_ipaddr(in_addr_t ipaddr, int *sindex)
 			s = slist[i];
 
 			/* Remove expired sessions while we're looking at them all */
-			if(SESSION_TIMEOUT > 0 && (currenttime - s->last_contact >= SESSION_TIMEOUT))
+			if(SESSION_TIMEOUT > 0 &&
+				(currenttime - s->last_contact >= SESSION_TIMEOUT) &&
+				s->cli_fd == 0)
 			{
 				LOG("Deleting expired session 0x%02x\n", s->sid);
 				tnfs_freesession(s, i);
