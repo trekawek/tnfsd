@@ -55,7 +55,7 @@ typedef struct _tcp_conn
 } TcpConnection;
 
 /* Handle the socket interface */
-void tnfs_sockinit();
+void tnfs_sockinit(int port);
 void tnfs_mainloop();
 void tnfs_handle_udpmsg();
 void tcp_accept(TcpConnection *tcp_conn_list);
