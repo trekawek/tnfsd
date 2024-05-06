@@ -291,7 +291,9 @@ Session *tnfs_findsession_ipaddr(in_addr_t ipaddr, int *sindex)
 			s = slist[i];
 
 			/* Remove expired sessions while we're looking at them all */
-			if(SESSION_TIMEOUT > 0 && (currenttime - s->last_contact >= SESSION_TIMEOUT))
+			if(SESSION_TIMEOUT > 0 &&
+				(currenttime - s->last_contact >= SESSION_TIMEOUT) &&
+				s->cli_fd == 0)
 			{
 				LOG("Deleting expired session 0x%02x\n", s->sid);
 				tnfs_freesession(s, i);
@@ -319,7 +321,7 @@ Session *tnfs_findsession_ipaddr(in_addr_t ipaddr, int *sindex)
 	return NULL;
 }
 
-void tnfs_removesession_by_cli_fd(int cli_fd)
+void tnfs_reset_cli_fd_in_sessions(int cli_fd)
 {
 	int i;
 	Session *s;
@@ -331,8 +333,8 @@ void tnfs_removesession_by_cli_fd(int cli_fd)
 			s = slist[i];
 			if (s->cli_fd == cli_fd)
 			{
-				LOG("Deleting disconnected session 0x%02x\n", s->sid);
-				tnfs_freesession(s, i);
+				LOG("Removing TCP connection handle from session 0x%02x\n", s->sid);
+				s->cli_fd = 0;
 			}
 		}
 	}

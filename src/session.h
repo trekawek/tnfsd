@@ -46,7 +46,7 @@ Session *tnfs_allocsession(int *sindex, uint16_t withSid);
 void tnfs_freesession(Session *s, int sindex);
 Session *tnfs_findsession_sid(uint16_t sid, int *sindex);
 Session *tnfs_findsession_ipaddr(in_addr_t ipaddr, int *sindex);
-void tnfs_removesession_by_cli_fd(int cli_fd);
+void tnfs_reset_cli_fd_in_sessions(int cli_fd);
 uint16_t tnfs_newsid();
 
 

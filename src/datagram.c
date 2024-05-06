@@ -118,7 +118,7 @@ const char *get_cmd_name(uint8_t cmd)
 	return "UNKNOWN_CMD";
 }
 
-void tnfs_sockinit()
+void tnfs_sockinit(int port)
 {
 	struct sockaddr_in servaddr;
 
@@ -137,7 +137,7 @@ void tnfs_sockinit()
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
-	servaddr.sin_port = htons(TNFSD_PORT);
+	servaddr.sin_port = htons(port);
 
 	if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0)
 		die("Unable to bind");
@@ -157,7 +157,7 @@ void tnfs_sockinit()
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
-	servaddr.sin_port = htons(TNFSD_PORT);
+	servaddr.sin_port = htons(port);
 	if (bind(tcplistenfd, (struct sockaddr *)&servaddr,
 			 sizeof(servaddr)) < 0)
 	{
@@ -303,7 +303,7 @@ void tnfs_handle_tcpmsg(TcpConnection *tcp_conn)
 	sz = read(tcp_conn->cli_fd, buf, sizeof(buf));
 	if (sz == 0) {
 		MSGLOG(tcp_conn->cliaddr.sin_addr.s_addr, "Disconnected client.");
-		tnfs_removesession_by_cli_fd(tcp_conn->cli_fd);
+		tnfs_reset_cli_fd_in_sessions(tcp_conn->cli_fd);
 		tcp_conn->cli_fd = 0;
 		return;
 	}
@@ -350,8 +350,14 @@ void tnfs_decode(struct sockaddr_in *cliaddr, int cli_fd, int rxbytes, unsigned 
 			TNFSMSGLOG(&hdr, "Session and IP do not match");
 			return;
 		}
+		if (sess->cli_fd != 0 && sess->cli_fd != cli_fd)
+		{
+			TNFSMSGLOG(&hdr, "Session is assigned to another TCP connection");
+			return;
+		}
 		/* Update session timestamp */
 		sess->last_contact = time(NULL);
+		sess->cli_fd = cli_fd;
 	}
 	else
 	{
