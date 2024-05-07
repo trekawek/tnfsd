@@ -30,6 +30,7 @@ TNFS daemon datagram handler
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
 
 #ifdef UNIX
 #include <sys/socket.h>
@@ -172,6 +173,9 @@ void tnfs_mainloop()
 	fd_set fdset;
 	fd_set errfdset;
 	TcpConnection tcpsocks[MAX_TCP_CONN];
+    struct timeval select_timeout;
+	time_t last_stats_report = 0;
+	time_t now = 0;
 
 	memset(&tcpsocks, 0, sizeof(tcpsocks));
 
@@ -192,7 +196,8 @@ void tnfs_mainloop()
 		}
 
 		FD_COPY(&fdset, &errfdset);
-		if ((readyfds = select(FD_SETSIZE, &fdset, NULL, &errfdset, NULL)) != 0)
+    	select_timeout.tv_sec = 1;
+		if ((readyfds = select(FD_SETSIZE, &fdset, NULL, &errfdset, &select_timeout)) != 0)
 		{
 			if (readyfds < 0)
 			{
@@ -223,6 +228,13 @@ void tnfs_mainloop()
 					}
 				}
 			}
+		}
+
+		time(&now);
+		if (STATS_INTERVAL > 0 && now - last_stats_report > STATS_INTERVAL)
+		{
+			stats_report(tcpsocks);
+			last_stats_report = now;
 		}
 	}
 }

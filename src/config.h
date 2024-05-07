@@ -41,6 +41,6 @@
 #define TIMEOUT_MSB	0x03	/* Timeout MSB (1 sec) */
 #define MAX_FILENAME_LEN 256	/* longest filename supported */
 #define MAX_IOSZ	512	/* maximum size of an IO operation */
-
+#define STATS_INTERVAL 60   /* how often the server stats should be logged. 0 to disable stats logging. */
 
 #endif

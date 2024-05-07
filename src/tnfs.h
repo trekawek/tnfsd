@@ -153,5 +153,11 @@ typedef struct _header
 typedef	void(*tnfs_cmdfunc)(Header *hdr, Session *sess,
 				unsigned char *buf, int bufsz);
 
+typedef struct _tcp_conn
+{
+	struct sockaddr_in cliaddr;  /* client address */
+	int cli_fd;					 /* FD for the TCP connection */
+} TcpConnection;
+
 #endif
 
