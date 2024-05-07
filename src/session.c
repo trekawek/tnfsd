@@ -41,13 +41,13 @@
 #include "bsdcompat.h"
 
 /* List of sessions */
-Session *slist[MAX_CLIENTS];
+Session *slist[MAX_SESSIONS];
 char *DEFAULT_ROOT = "/";
 
 void tnfs_init()
 {
 	int i;
-	for (i = 0; i < MAX_CLIENTS; i++)
+	for (i = 0; i < MAX_SESSIONS; i++)
 		slist[i] = NULL;
 
 #ifdef BSD
@@ -186,7 +186,7 @@ Session *tnfs_allocsession(int *sindex, uint16_t withSid)
 	Session *s;
 
 	LOG("Allocating new session for 0x%02x\n", withSid);
-	for (*sindex = 0; (*sindex) < MAX_CLIENTS; (*sindex)++)
+	for (*sindex = 0; (*sindex) < MAX_SESSIONS; (*sindex)++)
 	{
 		if (slist[*sindex] == NULL)
 		{
@@ -244,7 +244,7 @@ Session *tnfs_findsession_sid(uint16_t sid, int *sindex)
 {
 	int i;
 	Session *s;
-	for (i = 0; i < MAX_CLIENTS; i++)
+	for (i = 0; i < MAX_SESSIONS; i++)
 	{
 		if (slist[i])
 		{
@@ -284,7 +284,7 @@ Session *tnfs_findsession_ipaddr(in_addr_t ipaddr, int *sindex)
 
 	currenttime = time(NULL);
 
-	for (i = 0; i < MAX_CLIENTS; i++)
+	for (i = 0; i < MAX_SESSIONS; i++)
 	{
 		if (slist[i])
 		{
@@ -303,9 +303,9 @@ Session *tnfs_findsession_ipaddr(in_addr_t ipaddr, int *sindex)
 			if (s->ipaddr == ipaddr)
 			{
 				// If we've reached the max for this IP, return the first match
-				if ((count + 1) >= MAX_CLIENTS_PER_IP)
+				if ((count + 1) >= MAX_SESSIONS_PER_IP)
 				{
-					LOG("Found we already %d sessions for this IP - returning oldest entry\n", MAX_CLIENTS_PER_IP);
+					LOG("Found we already %d sessions for this IP - returning oldest entry\n", MAX_SESSIONS_PER_IP);
 					*sindex = first_match_idx;
 					return first_match_sess;
 				}
@@ -326,7 +326,7 @@ void tnfs_reset_cli_fd_in_sessions(int cli_fd)
 	int i;
 	Session *s;
 
-	for (i = 0; i < MAX_CLIENTS; i++)
+	for (i = 0; i < MAX_SESSIONS; i++)
 	{
 		if (slist[i])
 		{
