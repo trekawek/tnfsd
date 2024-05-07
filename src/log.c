@@ -35,12 +35,15 @@
 
 void die(const char *msg)
 {
+	log_time();
 	fprintf(stderr, "%s\n", msg);
 	exit(-1);
 }
 
 void TNFSMSGLOG(Header *hdr, const char *msg, ...)
 {
+	log_time();
+
 	unsigned char *ip = (unsigned char *)&hdr->ipaddr;
 	char buff[128];
 
@@ -59,6 +62,8 @@ void TNFSMSGLOG(Header *hdr, const char *msg, ...)
 
 void USGLOG(Header *hdr, const char *msg, ...)
 {
+	log_time();
+
 	unsigned char *ip = (unsigned char *)&hdr->ipaddr;
 	char buff[128];
 	char sdate[20];
@@ -84,6 +89,8 @@ void USGLOG(Header *hdr, const char *msg, ...)
 
 void MSGLOG(in_addr_t ipaddr, const char *msg, ...)
 {
+	log_time();
+
 	unsigned char *ip = (unsigned char *)&ipaddr;
 	char buff[128];
 
@@ -102,6 +109,8 @@ void MSGLOG(in_addr_t ipaddr, const char *msg, ...)
 
 void LOG(const char *msg, ...)
 {
+	log_time();
+
 	va_list vargs;
 	va_start(vargs, msg);
 
@@ -111,4 +120,14 @@ void LOG(const char *msg, ...)
 #ifdef WIN32
 	fflush(stderr);
 #endif
+}
+
+void log_time()
+{
+    time_t now;
+    time(&now);
+
+    char formatted_time[sizeof "2011-10-08T07:07:09Z"];
+    strftime(formatted_time, sizeof formatted_time, "%FT%TZ", gmtime(&now));
+	fprintf(stderr, "[%s] ", formatted_time);
 }
