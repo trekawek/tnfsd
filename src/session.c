@@ -360,3 +360,16 @@ uint16_t tnfs_newsid()
 	die("Tried to find a new SID 256 times. (Broken PRNG)");
 	return 0;
 }
+
+uint16_t tnfs_session_count()
+{
+	uint16_t count = 0;
+	for (uint16_t i = 0; i < MAX_SESSIONS; i++)
+	{
+		if (slist[i])
+		{
+			count++;
+		}
+	}
+	return count;
+}

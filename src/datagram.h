@@ -46,13 +46,8 @@
 #define FD_COPY(f, t)   memcpy(t, f, sizeof(*(f)))
 #endif
 
+#include "stats.h"
 #include "tnfs.h"
-
-typedef struct _tcp_conn
-{
-	struct sockaddr_in cliaddr;  /* client address */
-	int cli_fd;					 /* FD for the TCP connection */
-} TcpConnection;
 
 /* Handle the socket interface */
 void tnfs_sockinit(int port);
@@ -66,5 +61,4 @@ void tnfs_invalidsession(Header *hdr);
 void tnfs_badcommand(Header *hdr, Session *sess);
 void tnfs_send(Session *sess, Header *hdr, unsigned char *msg, int msgsz);
 void tnfs_resend(Session *sess, struct sockaddr_in *cliaddr, int cli_fd);
-
 #endif
