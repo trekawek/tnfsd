@@ -42,8 +42,10 @@ int main(int argc, char **argv);
 int main(int argc, char **argv)
 {
     int opt;
+#ifdef ENABLE_CHROOT
     char *uvalue = NULL;
     char *gvalue = NULL;
+#endif
     char *pvalue = NULL;
 
     if(argc >= 2)

@@ -122,12 +122,23 @@ void LOG(const char *msg, ...)
 #endif
 }
 
-void log_time()
-{
+void log_time() {
     time_t now;
+    struct tm *gmt;
+
     time(&now);
+    gmt = gmtime(&now);
+    if (gmt == NULL) {
+        fprintf(stderr, "Failed to convert time to GMT.\n");
+        return;
+    }
 
     char formatted_time[sizeof "2011-10-08T07:07:09Z"];
-    strftime(formatted_time, sizeof formatted_time, "%FT%TZ", gmtime(&now));
-	fprintf(stderr, "[%s] ", formatted_time);
+    // Replace %F and %T with equivalents for broader compatibility (wasn't working in MinGW)
+    if (strftime(formatted_time, sizeof formatted_time, "%Y-%m-%dT%H:%M:%SZ", gmt) == 0) {
+        fprintf(stderr, "[??] ");
+        return;
+    }
+
+    fprintf(stderr, "[%s] ", formatted_time);
 }
