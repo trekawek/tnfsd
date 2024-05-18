@@ -153,7 +153,9 @@ void tnfs_sockinit(int port)
 	{
     	die("setsockopt(SO_REUSEADDR) failed");
 	}
+#ifndef WIN32
 	signal(SIGPIPE, SIG_IGN);
+#endif
 
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
