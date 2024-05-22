@@ -135,7 +135,7 @@ int main(int argc, char **argv)
         }
     }
 
-	const char *version = "24.0503.1";
+	const char *version = "24.0522.1";
 
 	LOG("Starting tnfsd version %s on port %d using root directory \"%s\"\n", version, port, argv[optind]);
 
