@@ -329,7 +329,7 @@ void tnfs_handle_tcpmsg(TcpConnection *tcp_conn)
 	int sz;
 
 	sz = recv(tcp_conn->cli_fd, (char *)buf, sizeof(buf), 0);
-	// LOG("tnfs_handle_tcpmsg, sz = %d\n", sz);
+	LOG("tnfs_handle_tcpmsg, sz = %d\n", sz);
 
 #ifdef WIN32
 	if (sz == SOCKET_ERROR) {
@@ -342,8 +342,15 @@ void tnfs_handle_tcpmsg(TcpConnection *tcp_conn)
 #endif
 
 	if (sz <= 0) {
-		MSGLOG(tcp_conn->cliaddr.sin_addr.s_addr, "Disconnected client.");
+		MSGLOG(tcp_conn->cliaddr.sin_addr.s_addr, "Disconnected client and closing socket");
 		tnfs_reset_cli_fd_in_sessions(tcp_conn->cli_fd);
+
+#ifdef WIN32
+		closesocket(tcp_conn->cli_fd);
+#else
+		close(tcp_conn->cli_fd);
+#endif
+
 		tcp_conn->cli_fd = 0;
 		return;
 	}
