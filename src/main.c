@@ -24,6 +24,7 @@
  *
  * */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -35,6 +36,7 @@
 #include "errortable.h"
 #include "chroot.h"
 #include "log.h"
+#include "auth.h"
 
 /* declare the main() - it won't be used elsewhere so I'll not bother
  * with putting it in a .h file */
@@ -47,14 +49,15 @@ int main(int argc, char **argv)
     char *uvalue = NULL;
     char *gvalue = NULL;
 #endif
+    bool read_only = false;
     char *pvalue = NULL;
 
     if(argc >= 2)
     {
         #ifdef ENABLE_CHROOT
-        while((opt = getopt(argc, argv, "u:g:p:")) != -1)
+        while((opt = getopt(argc, argv, "ru:g:p:")) != -1)
         #else
-        while((opt = getopt(argc, argv, "p:")) != -1)
+        while((opt = getopt(argc, argv, "rp:")) != -1)
         #endif
         {
             switch(opt)
@@ -62,6 +65,9 @@ int main(int argc, char **argv)
 
                 case 'p':
                     pvalue = optarg;
+                    break;
+                case 'r':
+                    read_only = true;
                     break;
                 #ifdef ENABLE_CHROOT
                 case 'u':
@@ -83,9 +89,9 @@ int main(int argc, char **argv)
     else
     {
     #ifdef ENABLE_CHROOT
-    LOG("Usage: tnfsd <root dir> [-u <username> -g <group> -p <port>]\n");
+    LOG("Usage: tnfsd <root dir> [-u <username> -g <group> -p <port>] -r\n");
     #else
-    LOG("Usage: tnfsd <root dir> [-p <port>]\n");
+    LOG("Usage: tnfsd <root dir> [-p <port>] -r\n");
     #endif
     exit(-1);
     }
@@ -139,13 +145,21 @@ int main(int argc, char **argv)
 	const char *version = "24.0522.1";
 
 	LOG("Starting tnfsd version %s on port %d using root directory \"%s\"\n", version, port, argv[optind]);
+    if (read_only)
+    {
+        LOG("The server runs in read-only mode. TNFS clients can only list and download files.\n");
+    }
+    else
+    {
+        LOG("The server runs in read-write mode. TNFS clients can upload and modify files. Use -r to enable read-only mode.\n");
+    }
 
-	tnfs_init();		/* initialize structures etc. */
-	tnfs_init_errtable();	/* initialize error lookup table */
-	tnfs_event_init();
-	tnfs_sockinit(port);	/* initialize communications */
-	tnfs_mainloop();	/* run */
-	tnfs_event_close();
+	tnfs_init();              /* initialize structures etc. */
+	tnfs_init_errtable();     /* initialize error lookup table */
+	tnfs_event_init();        /* initialize event system */
+	tnfs_sockinit(port);      /* initialize communications */
+	auth_init(read_only);     /* initialize authentication */
+	tnfs_mainloop();          /* run */
 
 	return 0;
 }
