@@ -24,6 +24,7 @@
  *
  * */
 
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,6 +35,7 @@
 #include "errortable.h"
 #include "chroot.h"
 #include "log.h"
+#include "auth.h"
 
 /* declare the main() - it won't be used elsewhere so I'll not bother
  * with putting it in a .h file */
@@ -46,14 +48,15 @@ int main(int argc, char **argv)
     char *uvalue = NULL;
     char *gvalue = NULL;
 #endif
+    bool enable_writes = false;
     char *pvalue = NULL;
 
     if(argc >= 2)
     {
         #ifdef ENABLE_CHROOT
-        while((opt = getopt(argc, argv, "u:g:p:")) != -1)
+        while((opt = getopt(argc, argv, "wu:g:p:")) != -1)
         #else
-        while((opt = getopt(argc, argv, "p:")) != -1)
+        while((opt = getopt(argc, argv, "wp:")) != -1)
         #endif
         {
             switch(opt)
@@ -61,6 +64,9 @@ int main(int argc, char **argv)
 
                 case 'p':
                     pvalue = optarg;
+                    break;
+                case 'w':
+                    enable_writes = true;
                     break;
                 #ifdef ENABLE_CHROOT
                 case 'u':
@@ -139,10 +145,11 @@ int main(int argc, char **argv)
 
 	LOG("Starting tnfsd version %s on port %d using root directory \"%s\"\n", version, port, argv[optind]);
 
-	tnfs_init();		/* initialize structures etc. */
-	tnfs_init_errtable();	/* initialize error lookup table */
-	tnfs_sockinit(port);	/* initialize communications */
-	tnfs_mainloop();	/* run */
+	tnfs_init();              /* initialize structures etc. */
+	tnfs_init_errtable();     /* initialize error lookup table */
+	tnfs_sockinit(port);      /* initialize communications */
+	auth_init(enable_writes); /* initialize authentication */
+	tnfs_mainloop();          /* run */
 
 	return 0;
 }
