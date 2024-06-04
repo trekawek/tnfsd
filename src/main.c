@@ -144,6 +144,14 @@ int main(int argc, char **argv)
 	const char *version = "24.0522.1";
 
 	LOG("Starting tnfsd version %s on port %d using root directory \"%s\"\n", version, port, argv[optind]);
+    if (enable_writes)
+    {
+        LOG("The server runs in read-write mode. TNFS clients can upload and modify files.\n");
+    }
+    else
+    {
+        LOG("The server runs in read-only mode. TNFS clients can only list and download files. Use -w to enable writes.\n");
+    }
 
 	tnfs_init();              /* initialize structures etc. */
 	tnfs_init_errtable();     /* initialize error lookup table */

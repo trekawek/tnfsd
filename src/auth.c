@@ -1,7 +1,6 @@
 #include "auth.h"
 #include "tnfs.h"
 #include "tnfs_file.h"
-#include <stdio.h>
 
 int RW_CMDS[] =
 {
