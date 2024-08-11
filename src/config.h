@@ -28,7 +28,7 @@
 #define MAX_SESSIONS        4096   /* maximum number of opened sessions */
 #define MAX_SESSIONS_PER_IP 4096   /* maximum number of sessions from a single IP */
 #define MAX_TCP_CONN        4096   /* maximum number of TCP connections */
-#define SESSION_TIMEOUT 21600 /* Sessions are thrown out after no contact for this many seconds. 0 = no timeout */
+#define SESSION_TIMEOUT 600 /* Sessions are thrown out after no contact for this many seconds. 0 = no timeout */
 #define CONN_TIMEOUT    600 /* TCP connections are thrown out after no contact for this many seconds. 0 = no timeout */
 #define TNFS_HEADERSZ	4	/* minimum header size */
 #define TNFS_MAX_PAYLOAD (MAXMSGSZ - TNFS_HEADERSZ - 1) /* Maximum usuable payload in a UDP datagram (-1 for status byte) */
