@@ -57,4 +57,6 @@ void tnfs_badcommand(Header *hdr, Session *sess);
 void tnfs_notpermitted(Header *hdr);
 void tnfs_send(Session *sess, Header *hdr, unsigned char *msg, int msgsz);
 void tnfs_resend(Session *sess, struct sockaddr_in *cliaddr, int cli_fd);
+void tnfs_close_stale_connections(TcpConnection *tcp_conn_list);
+void tnfs_close_tcp(TcpConnection *tcp_conn);
 #endif
