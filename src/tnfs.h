@@ -157,6 +157,7 @@ typedef struct _tcp_conn
 {
 	struct sockaddr_in cliaddr;  /* client address */
 	int cli_fd;					 /* FD for the TCP connection */
+	time_t last_contact;         /* timestamp of last received request */
 } TcpConnection;
 
 #endif

@@ -221,6 +221,8 @@ void tnfs_mainloop()
 
 	while (1)
 	{
+		tnfs_close_stale_connections(tcpsocks);
+
 		event_wait_res_t *wait_res = tnfs_event_wait(1);
 		if (wait_res->size == SOCKET_ERROR)
 		{
@@ -301,6 +303,7 @@ void tcp_accept(TcpConnection *tcp_conn_list)
 				MSGLOG(cliaddr.sin_addr.s_addr, "New TCP connection at index %d.", i);
 				tcp_conn->cli_fd = acc_fd;
 				tcp_conn->cliaddr = cliaddr;
+				tcp_conn->last_contact = time(NULL);
 				return;
 			}
 			tcp_conn++;
@@ -361,6 +364,8 @@ void tnfs_handle_tcpmsg(TcpConnection *tcp_conn)
 	unsigned char buf[MAXMSGSZ];
 	int sz;
 
+	tcp_conn->last_contact = time(NULL);
+
 	sz = recv(tcp_conn->cli_fd, (char *)buf, sizeof(buf), 0);
 
 #ifdef WIN32
@@ -375,6 +380,14 @@ void tnfs_handle_tcpmsg(TcpConnection *tcp_conn)
 
 	if (sz <= 0) {
 		MSGLOG(tcp_conn->cliaddr.sin_addr.s_addr, "Client disconnected, closing socket.");
+		tnfs_close_tcp(tcp_conn);
+		return;
+	}
+	tnfs_decode(&tcp_conn->cliaddr, tcp_conn->cli_fd, sz, buf);
+}
+
+void tnfs_close_tcp(TcpConnection *tcp_conn)
+{
 		tnfs_reset_cli_fd_in_sessions(tcp_conn->cli_fd);
 
 #ifdef WIN32
@@ -384,9 +397,6 @@ void tnfs_handle_tcpmsg(TcpConnection *tcp_conn)
 #endif
 		tnfs_event_unregister(tcp_conn->cli_fd);
 		tcp_conn->cli_fd = 0;
-		return;
-	}
-	tnfs_decode(&tcp_conn->cliaddr, tcp_conn->cli_fd, sz, buf);
 }
 
 void tnfs_decode(struct sockaddr_in *cliaddr, int cli_fd, int rxbytes, unsigned char *rxbuf)
@@ -573,5 +583,23 @@ void tnfs_resend(Session *sess, struct sockaddr_in *cliaddr, int cli_fd)
 	{
 		MSGLOG(cliaddr->sin_addr.s_addr,
 			   "Retransmit was truncated");
+	}
+}
+
+void tnfs_close_stale_connections(TcpConnection *tcp_conn_list)
+{
+	time_t now = time(NULL);
+	TcpConnection *tcp_conn = tcp_conn_list;
+	for (int i = 0; i < MAX_TCP_CONN; i++)
+	{
+		if (tcp_conn->cli_fd != 0)
+		{
+			if ((now - tcp_conn->last_contact) > CONN_TIMEOUT)
+			{
+				MSGLOG(tcp_conn->cliaddr.sin_addr.s_addr, "Socket is no longer active; disconnecting.");
+				tnfs_close_tcp(tcp_conn);
+			}
+		}
+		tcp_conn++;
 	}
 }
