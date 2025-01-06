@@ -1,3 +1,5 @@
+//go:build linux
+
 #include "event.h"
 #include "log.h"
 

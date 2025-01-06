@@ -1,3 +1,5 @@
+//go:build windows
+
 #include "event.h"
 #include "log.h"
 

@@ -1,3 +1,4 @@
+//go:build ignore
 /* The MIT License
  *
  * Copyright (c) 2010 Dylan Smith

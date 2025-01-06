@@ -6,13 +6,13 @@ endif
 
 ifeq ($(OS),LINUX)
     FLAGS = -Wall -DUNIX -DNEED_BSDCOMPAT -DENABLE_CHROOT -DNEED_ERRTABLE
-    EXOBJS = strlcpy.o strlcat.o event_epoll.o 
+    EXOBJS = strlcpy.o strlcat.o event_epoll.o
     LIBS =
     EXEC = tnfsd
 endif
 ifeq ($(OS),Windows_NT)
     FLAGS = -Wall -DWIN32 -DNEED_ERRTABLE -DNEED_BSDCOMPAT
-    EXOBJS = strlcpy.o strlcat.o event_select.o 
+    EXOBJS = strlcpy.o strlcat.o event_select.o
     LIBS = -lwsock32
     EXEC = tnfsd.exe
 endif
@@ -39,4 +39,3 @@ all:	$(OBJS)
 
 clean:
 	$(RM) -f $(OBJS) bin/$(EXEC)
-

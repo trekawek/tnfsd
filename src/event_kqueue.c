@@ -1,3 +1,5 @@
+//go:build darwin
+
 #include "event.h"
 #include "log.h"
 
@@ -24,7 +26,7 @@ bool tnfs_event_register(int fd)
     struct kevent change_event[4];
     EV_SET(change_event, fd, EVFILT_READ, EV_ADD, 0, 0, 0);
     if (kevent(kq, change_event, 1, NULL, 0, NULL) == -1)
-    {  
+    {
         LOG("tnfs_event_register: can't register kevent\n");
         return false;
     }
