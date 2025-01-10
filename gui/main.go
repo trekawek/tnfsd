@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
+	fmt.Println("Starting server")
 	gotnfsd.StartServer(".")
-	fmt.Println(".")
 }
