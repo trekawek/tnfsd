@@ -17,7 +17,7 @@ ifeq ($(OS),Windows_NT)
     EXEC = tnfsd.exe
 endif
 ifeq ($(OS),BSD)
-    FLAGS = -Wall -DUNIX -DENABLE_CHROOT -DNEED_ERRTABLE -DBSD
+    FLAGS = -Wall -DUNIX -DBSD -DENABLE_CHROOT
     EXOBJS = event_kqueue.o
     LIBS =
     EXEC = tnfsd
@@ -31,8 +31,8 @@ ifdef USAGELOG
     LOGFLAGS = -DUSAGELOG
 endif
 
-CFLAGS=$(FLAGS) $(EXFLAGS) $(LOGFLAGS)
-OBJS=main.o datagram.o event_common.o log.o session.o endian.o directory.o errortable.o tnfs_file.o chroot.o fileinfo.o stats.o auth.o $(EXOBJS)
+CFLAGS=$(FLAGS) $(EXFLAGS) $(LOGFLAGS) -DNEED_ERRTABLE
+OBJS=main.o datagram.o event_common.o log.o session.o endian.o directory.o errortable.o tnfs_file.o chroot.o fileinfo.o stats.o auth.o tnfsd.o $(EXOBJS)
 
 all:	$(OBJS)
 	$(CC) -o ../bin/$(EXEC) $(OBJS) $(LIBS)
