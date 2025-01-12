@@ -26,18 +26,13 @@ func (e SocketError) Error() string {
 }
 
 func Init(_ *os.File) {
-	C.tnfsd_init()
-
 	r, w, err := os.Pipe()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
 	C.tnfsd_init_logs(C.int(w.Fd()))
-
-	// w.Write([]byte("hi\n"))
-	// w2 := os.NewFile(w.Fd(), "via fd")
-	// w2.Write([]byte("hi via fd\n"))
+	C.tnfsd_init()
 
 	go func() {
 		buf := bufio.NewReader(r)
@@ -47,30 +42,9 @@ func Init(_ *os.File) {
 				log.Println("Error from buf.ReadLine()")
 				log.Fatal(err.Error())
 			}
-			fmt.Println(string(line))
+			fmt.Println("LOGGED LINE: " + string(line))
 		}
 	}()
-
-	// go func() {
-	// 	scanner := bufio.NewScanner(r)
-	// 	scanner.Split(bufio.ScanBytes)
-	// 	for scanner.Scan() {
-	// 		fmt.Print(scanner.Text())
-	// 	}
-	// }()
-
-	// var buf bytes.Buffer
-
-	// go func() {
-	// 	io.Copy(&buf, w)
-	// }()
-
-	// go func() {
-	// 	for {
-	// 		ioutil.ReadAll(r)
-	// 		time.Sleep(1 * time.Second)
-	// 	}
-	// }()
 }
 
 func Start(rootPath string, port int, read_only bool) error {

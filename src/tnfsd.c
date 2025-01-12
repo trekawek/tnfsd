@@ -20,7 +20,7 @@ void tnfsd_init_logs(int log_output_fd)
 	FILE* log_output = fdopen(log_output_fd, "w");
 	log_init(log_output);
 
-	fprintf(log_output, "Hi from tnfsd.c");
+	fprintf(log_output, "Hi from tnfsd.c\n");
 }
 
 int tnfsd_start(const char* path, int port, bool read_only)
