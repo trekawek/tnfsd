@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	gotnfsd "github.com/fujinetwifi/tnfsd"
+	"github.com/nwah/gotnfsd"
 )
 
 func main() {

@@ -2,6 +2,6 @@ module tnfsd-gui
 
 go 1.23.3
 
-replace github.com/fujinetwifi/tnfsd => ../src
+replace github.com/nwah/gotnfsd => ..
 
-require github.com/fujinetwifi/tnfsd v0.0.1
+require github.com/nwah/gotnfsd v0.0.1

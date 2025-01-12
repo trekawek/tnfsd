@@ -1,45 +1,43 @@
-package go_tnfsd
+package gotnfsd
 
 /*
-#cgo CFLAGS: -Wall -DUNIX -DENABLE_CHROOT -DNEED_ERRTABLE -DBSD -DGO
-#include "datagram.h"
-#include "event.h"
-#include "session.h"
-#include "directory.h"
-#include "errortable.h"
-#include "chroot.h"
-#include "log.h"
-#include "auth.h"
-
-char* tnfs_server_start(char *root) {
-	int port = TNFSD_PORT;
-	bool read_only = false;
-	tnfs_setroot(root);
-	tnfs_init();           // initialize structures etc.
-	tnfs_init_errtable();  // initialize error lookup table
-	tnfs_event_init();     // initialize event system
-	tnfs_sockinit(port);   // initialize communications
-	auth_init(read_only);  // initialize authentication
-	tnfs_mainloop();
-	return "hello";
-}
+#cgo CFLAGS: -DUNIX -DENABLE_CHROOT -DNEED_ERRTABLE -DBSD -DGO
+#include <stdio.h>
+#include <stdlib.h>
+#include "tnfsd.h"
 */
 import "C"
-
 import (
-	"fmt"
+	"unsafe"
 )
 
-func StartServer(tnfsRoot string) error {
-	path := C.CString(tnfsRoot)
-	ptr, err := C.tnfs_server_start(path)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
+type InvalidDirError struct{}
+type SocketError struct{}
+
+func (e InvalidDirError) Error() string {
+	return "invalid directory"
+}
+func (e SocketError) Error() string {
+	return "couldn't open socket"
+}
+
+func Init() {
+	C.tnfsd_init()
+}
+
+func Start(rootPath string, port int, read_only bool) error {
+	path := C.CString(rootPath)
+	defer C.free(unsafe.Pointer(path))
+
+	err := C.tnfsd_start(path, C.int(port), C.bool(read_only))
+	if err == -1 {
+		return &InvalidDirError{}
+	} else if err == -2 {
+		return &SocketError{}
 	}
-
-	result := C.GoString(ptr)
-	fmt.Println(result)
-
 	return nil
+}
+
+func Stop() {
+	C.tnfsd_stop()
 }
