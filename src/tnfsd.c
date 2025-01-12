@@ -19,6 +19,8 @@ void tnfsd_init_logs(int log_output_fd)
 {
 	FILE* log_output = fdopen(log_output_fd, "w");
 	log_init(log_output);
+
+	fprintf(log_output, "Hi from tnfsd.c");
 }
 
 int tnfsd_start(const char* path, int port, bool read_only)
@@ -43,7 +45,7 @@ int tnfsd_start(const char* path, int port, bool read_only)
 	{
 		LOG("Can't bind port %d\n", port);
 		return TNFSD_ERR_SOCKET_ERROR;
-	}      
+	}
 	auth_init(read_only);     /* initialize authentication */
 	tnfs_mainloop();          /* run */
 	tnfs_event_close();
