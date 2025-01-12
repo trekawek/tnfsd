@@ -8,9 +8,6 @@ package gotnfsd
 */
 import "C"
 import (
-	"bufio"
-	"fmt"
-	"log"
 	"os"
 	"unsafe"
 )
@@ -25,26 +22,9 @@ func (e SocketError) Error() string {
 	return "couldn't open socket"
 }
 
-func Init(_ *os.File) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	C.tnfsd_init_logs(C.int(w.Fd()))
+func Init(log *os.File) {
+	C.tnfsd_init_logs(C.int(log.Fd()))
 	C.tnfsd_init()
-
-	go func() {
-		buf := bufio.NewReader(r)
-		for {
-			line, _, err := buf.ReadLine()
-			if err != nil {
-				log.Println("Error from buf.ReadLine()")
-				log.Fatal(err.Error())
-			}
-			fmt.Println("LOGGED LINE: " + string(line))
-		}
-	}()
 }
 
 func Start(rootPath string, port int, read_only bool) error {
